@@ -1,0 +1,37 @@
+{
+  "name": "dotenvenc",
+  "version": "1.0.0",
+  "description": "Encrypt and decrypt your .env file so you can store sensitive information (passwords etc.) in source control",
+  "keywords": [
+    "1password",
+    "dotenv",
+    "decrypt",
+    "encrypt",
+    "env",
+    "environment",
+    "keys",
+    "secrets",
+    "password",
+    "token"
+  ],
+  "author": "Thalis Kalfigkopoulos <tkalfigo@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tkalfigo/dotenvenc.git"
+  },
+  "dependencies": {
+    "md5-file": "3.1.1",
+    "minimist": "^1.2.0"
+  },
+  "main": "index",
+  "bin": {
+    "dotenvenc": "./bin/dotenvenc"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec"
+  },
+  "devDependencies": {
+    "chai": "^4.1.0",
+    "mocha": "^3.4.2"
+  }
+}

@@ -1,0 +1,54 @@
+#!/usr/bin/env node
+
+/**
+ * To encrypt a file:
+ * -e <fileToEncrypt> <password>
+ * To decrype a file:
+ * -d <fileToDecrypt> <password>
+ */
+let args = require('minimist')(process.argv.slice(2), {
+        boolean: ['e', 'd', 'h'],
+        alias: {
+            'e': 'encrypt',
+            'd': 'decrypt',
+            'h': 'help'
+        }
+    }),
+    dotenvenc = require('../index');
+
+function printHelp() {
+    console.log(`
+Arguments:
+    -e, --encrypt   to encrypt the .env file into .env.enc (default operation; can be ommited)
+    -d, --decrypt   to decrypt a .env.enc file into .env
+    -h, --help      print this help
+
+Usage:
+    $ dotenvenc [-e|-d] <password>
+
+Examples:
+    - To encrypt .env into .env.enc
+        $ dotenvenc -e myEncryptionPassword
+        or equivalently ommiting the '-e' flag (default)
+        $ dotenvenc myEncryptionPassword
+    - To decrypt .env.enc into the original .env
+        $ dotenvenc -d myEncryptionPassword
+
+    Accepts long argument names i.e. -e is equivalent to --encrypt and -d to --decrypt
+`);
+    process.exit(0);
+}
+
+passwd = args._[0];
+if (args.h) {
+    printHelp();
+} else if (!passwd){
+    console.log(`Error: missing password`);
+    printHelp();
+} else if (args.d) {
+    // Decrypt .env.enc into .env
+    dotenvenc(passwd);
+} else {
+    // Script's default operation is to encrypt the .env into .env.enc
+    dotenvenc.encrypt(passwd);
+}
