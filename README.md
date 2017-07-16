@@ -2,13 +2,13 @@
 
   Encrypt and decrypt your .env so it doesn't expose sensitive information (passwords, tokens etc.)
 
-## Usage
+## Use case
 
-You have a `.env` file in your project and are using it with a package like [`dotenv`](https://www.npmjs.com/package/dotenv)
-to expose its contents as environment variables.
+You have a `.env` file in your project (usually at the app's root folder) and are using it with a package
+like [`dotenv`](https://www.npmjs.com/package/dotenv) to expose its contents as environment variables in your app.
 But your `.env` contains sensitive information (passwords, tokens etc.) in clear-text so you don't want to place it in
 your versioned code. Using `dotenvenc` you generate from `.env` an encrypted version `.env.enc` and only share
-this in your project. In your code you regenerate `.env` from `.env.enc` at runtime when you need to use the sensitive data.
+this in your project. In your code you regenerate `.env` from `.env.enc` at runtime when you need to access the sensitive data.
 
 Tip: add `.env` in your `.gitignore` so it's guaranteed to never get versioned.
 

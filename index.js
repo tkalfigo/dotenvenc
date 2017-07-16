@@ -34,11 +34,9 @@ function findFileLocation(file) {
   while (true) {
     if (exists(location + file)) {
       break;
-    } else {
+    } else if (exists(location + 'package.json') || location === '/') {
       // Assumption is that reaching the app root folder or the system '/' marks the end of the search
-      if (exists(location + 'package.json') || location === '/') {
-        throw new Error(`Failed to find file "${file}" within the project`);
-      }
+      throw new Error(`Failed to find file "${file}" within the project`);
     }
     // Go one level up
     location = path.resolve('../' + location) + '/';
@@ -49,7 +47,7 @@ function findFileLocation(file) {
 /**
  * Write to disk decrypted file (.env) from encrypted file (.env.enc)
  * Does not load the variables into process.env
- * @param     {String}    passwd      password for decrpytion
+ * @param     {String}    passwd      the key used to encrypt the .env into .env.enc we'll use now for decrpypting
  * @returns   {String}                writes the decrypted file to disk at same location where the decrypted file was found and returns its md5 checksum
  */
 function decrypt(passwd) {
@@ -61,14 +59,14 @@ function decrypt(passwd) {
   if (!passwd) {
     throw new Error('decryption requires a password');
   }
-  decBuff = Buffer.concat([decipher.update(readFile(ENCRYPTED_FILENAME)), decipher.final()]);
+  decBuff = Buffer.concat([decipher.update(readFile(encryptedFileFullPath)), decipher.final()]);
   writeFile(decryptedFileFullPath, decBuff);
   return md5FileSync(decryptedFileFullPath);
 }
 
 /**
  * Write to disk encrypted file (.env.enc) from decrypted file (.env)
- * @param     {String}    passwd
+ * @param     {String}    passwd      the key used to encrypt the .env into .env.enc
  * @returns   {String}                writes the encrypted file to disk at same location where the encrypted file was found and returns its md5 checksum
  */
 function encrypt(passwd) {

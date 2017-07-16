@@ -9,12 +9,13 @@
 let args = require('minimist')(process.argv.slice(2), {
         boolean: ['e', 'd', 'h'],
         alias: {
-            'e': 'encrypt',
-            'd': 'decrypt',
-            'h': 'help'
+            e: 'encrypt',
+            d: 'decrypt',
+            h: 'help'
         }
     }),
-    dotenvenc = require('../index');
+    dotenvenc = require('../index'),
+    passwd = args._[0];
 
 function printHelp() {
     console.log(`
@@ -39,10 +40,9 @@ Examples:
     process.exit(0);
 }
 
-passwd = args._[0];
 if (args.h) {
     printHelp();
-} else if (!passwd){
+} else if (!passwd) {
     console.log(`Error: missing password`);
     printHelp();
 } else if (args.d) {
