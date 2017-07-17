@@ -10,14 +10,14 @@ const ENCRYPTED_FILENAME = '.env.enc',
   DECRYPTED_FILENAME = '.env';
 
 /**
- * Checks if @filePath exists (either file or directory)
- * @param     {String}  filePath    name of file or directory
- * @returns   {Boolean}             if @filePath exists and is readable file or directory
+ * Checks if a file or directory exists
+ * @param     {String}  fileOrDir   name of file or directory
+ * @returns   {Boolean}             if @fileOrDir exists and is readable file or directory
  */
-function exists(filePath) {
+function exists(fileOrDir) {
   let stats;
   try {
-    stats = statSync(filePath);
+    stats = statSync(fileOrDir);
     return stats.isFile() || stats.isDirectory();
   } catch (err) {
     return false;

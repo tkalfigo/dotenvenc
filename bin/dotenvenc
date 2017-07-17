@@ -17,7 +17,13 @@ let args = require('minimist')(process.argv.slice(2), {
     dotenvenc = require('../index'),
     passwd = args._[0];
 
-function printHelp() {
+/**
+ * @param   {String}    error       optional error message to print before printing the help syntax
+ */
+function printHelp(error) {
+    if (error) {
+        console.log(`Error: `, error);
+    }
     console.log(`
 Arguments:
     -e, --encrypt   to encrypt the .env file into .env.enc (default operation; can be ommited)
@@ -34,8 +40,6 @@ Examples:
         $ dotenvenc myEncryptionPassword
     - To decrypt .env.enc into the original .env
         $ dotenvenc -d myEncryptionPassword
-
-    Accepts long argument names i.e. -e is equivalent to --encrypt and -d to --decrypt
 `);
     process.exit(0);
 }
@@ -43,8 +47,7 @@ Examples:
 if (args.h) {
     printHelp();
 } else if (!passwd) {
-    console.log(`Error: missing password`);
-    printHelp();
+    printHelp('missing password');
 } else if (args.d) {
     // Decrypt .env.enc into .env
     dotenvenc(passwd);
