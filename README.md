@@ -10,7 +10,10 @@ But your `.env` contains sensitive information (passwords, tokens etc.) in clear
 your versioned code. Using `dotenvenc` you generate from `.env` an encrypted version `.env.enc` and only share
 this in your project. In your code you regenerate `.env` from `.env.enc` at runtime when you need to access the sensitive data.
 
-Tip: add `.env` in your `.gitignore` so it's guaranteed to never get versioned.
+NOTE: this package is meaningful only if used in combination with a package like [`dotenv`](https://www.npmjs.com/package/dotenv) 
+which actually creates the environment variables found in the generated decrypted `.env` file.
+
+TIP: add `.env` in your `.gitignore` so it's guaranteed to never get versioned.
 
 ## Installation
 
