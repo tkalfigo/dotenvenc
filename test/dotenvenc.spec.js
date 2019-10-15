@@ -2,6 +2,7 @@ const ENC_PASSWD = 'myTestingEncryptionPassword',
     DECRYPTED_FILE = './.env',
     DECRYPTED_FILE_BACKUP = './.env.backup',
     ENCRYPTED_FILE = './.env.enc',
+    ENCRYPTED_FILE_CUSTOM = './.env.enc.custom',
     ENCRYPTED_FILE_BACKUP = './.env.enc.backup';
 
 let dotenvenc = require('../index'),
@@ -25,6 +26,11 @@ describe('encryption', () => {
         let encryptedFileMD5 = dotenvenc.encrypt(ENC_PASSWD);
         expect(encryptedFileMD5).to.equal(md5FileSync(ENCRYPTED_FILE));
     });
+
+    it('should encrypt .env into valid .env.enc.custom', () => {
+        let encryptedFileMD5 = dotenvenc.encrypt(ENC_PASSWD, ENCRYPTED_FILE_CUSTOM);
+        expect(encryptedFileMD5).to.equal(md5FileSync(ENCRYPTED_FILE_CUSTOM));
+    });
 });
 
 describe('decryption', () => {
@@ -41,6 +47,11 @@ describe('decryption', () => {
 
     it('should decrypt .env.enc into valid .env', () => {
         let decryptedFileMD5 = dotenvenc(ENC_PASSWD);
+        expect(decryptedFileMD5).to.equal(md5FileSync(DECRYPTED_FILE));
+    });
+
+    it('should decrypt .env.enc.custom into valid .env', () => {
+        let decryptedFileMD5 = dotenvenc(ENC_PASSWD, ENCRYPTED_FILE_CUSTOM);
         expect(decryptedFileMD5).to.equal(md5FileSync(DECRYPTED_FILE));
     });
 });
