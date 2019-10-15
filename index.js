@@ -49,10 +49,16 @@ function findFileLocation(file) {
 /**
  * Write to disk decrypted file (.env) from encrypted file (.env.enc)
  * Does not load the variables into process.env
- * @param     {String}    passwd      the key used to encrypt the .env into .env.enc we'll use now for decrpypting
- * @returns   {String}                writes the decrypted file to disk at same location where the decrypted file was found and returns its md5 checksum
+ * @param     {String}    passwd                the key used to encrypt the .env into .env.enc we'll use now for decrpypting
+ * @param     {String}    [encryptedFilename]   optionally the encrypted file's name
+ * @returns   {String}                          writes the decrypted file to disk at same location where the decrypted file was found and returns its md5 checksum
  */
-function decrypt(passwd) {
+function decrypt(passwd, encryptedFilename) {
+  let decipher = crypto.createDecipher(algor, passwd);
+  let filename = encryptedFilename || ENCRYPTED_FILENAME;
+  let encryptedFileLocation = findFileLocation(filename);
+  let encryptedFileFullPath = encryptedFileLocation + filename;
+  let decryptedFileFullPath = encryptedFileLocation + DECRYPTED_FILENAME; // we write decrypted file at same location as where we found encrypted file
   if (!passwd) {
     throw new Error('decryption requires a password');
   }
@@ -72,10 +78,16 @@ function decrypt(passwd) {
 
 /**
  * Write to disk encrypted file (.env.enc) from decrypted file (.env)
- * @param     {String}    passwd      the key used to encrypt the .env into .env.enc
- * @returns   {String}                writes the encrypted file to disk at same location where the encrypted file was found and returns its md5 checksum
+ * @param     {String}    passwd                the key used to encrypt the .env into .env.enc
+ * @param     {String}    [encryptedFilename]   optionally the encrypted file's name
+ * @returns   {String}                        writes the encrypted file to disk at same location where the encrypted file was found and returns its md5 checksum
  */
-function encrypt(passwd) {
+function encrypt(passwd, encryptedFilename) {
+  let cipher = crypto.createCipher(algor, passwd);
+  let filename = encryptedFilename || ENCRYPTED_FILENAME;
+  let decryptedFileLocation = findFileLocation(DECRYPTED_FILENAME);
+  let decryptedFileFullPath = decryptedFileLocation + DECRYPTED_FILENAME;
+  let encryptedFileFullPath = decryptedFileLocation + filename; // we write encrypted file at same location as where we found decrypted file
   if (!passwd) {
     throw new Error('encryption requires a password');
   }
