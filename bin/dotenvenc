@@ -8,10 +8,12 @@
  */
 let args = require('minimist')(process.argv.slice(2), {
         boolean: ['e', 'd', 'h'],
+        string: ['f'],
         alias: {
             e: 'encrypt',
             d: 'decrypt',
-            h: 'help'
+            f: 'filename',
+            h: 'help',
         }
     }),
     dotenvenc = require('../index'),
@@ -26,9 +28,10 @@ function printHelp(error) {
     }
     console.log(`
 Arguments:
-    -e, --encrypt   to encrypt the .env file into .env.enc (default operation; can be ommited)
-    -d, --decrypt   to decrypt a .env.enc file into .env
-    -h, --help      print this help
+    -e, --encrypt    to encrypt the .env file into .env.enc (default operation; can be ommited)
+    -d, --decrypt    to decrypt a .env.enc file into .env
+    -f, --filename   name of the encrypted file, such as .env.enc.production
+    -h, --help       print this help
 
 Usage:
     $ dotenvenc [-e|-d] <password>
@@ -50,8 +53,8 @@ if (args.h) {
     printHelp('missing password');
 } else if (args.d) {
     // Decrypt .env.enc into .env
-    dotenvenc(passwd);
+    dotenvenc(passwd, args.f);
 } else {
     // Script's default operation is to encrypt the .env into .env.enc
-    dotenvenc.encrypt(passwd);
+    dotenvenc.encrypt(passwd, args.f);
 }

@@ -50,10 +50,11 @@ function findFileLocation(file) {
  * @param     {String}    passwd      the key used to encrypt the .env into .env.enc we'll use now for decrpypting
  * @returns   {String}                writes the decrypted file to disk at same location where the decrypted file was found and returns its md5 checksum
  */
-function decrypt(passwd) {
+function decrypt(passwd, encryptedFilename) {
   let decipher = crypto.createDecipher(algor, passwd),
-    encryptedFileLocation = findFileLocation(ENCRYPTED_FILENAME),
-    encryptedFileFullPath = encryptedFileLocation + ENCRYPTED_FILENAME,
+    filename = encryptedFilename || ENCRYPTED_FILENAME,
+    encryptedFileLocation = findFileLocation(filename),
+    encryptedFileFullPath = encryptedFileLocation + filename,
     decryptedFileFullPath = encryptedFileLocation + DECRYPTED_FILENAME, // we write decrypted file at same location as where we found encrypted file
     decBuff;
   if (!passwd) {
@@ -69,11 +70,12 @@ function decrypt(passwd) {
  * @param     {String}    passwd      the key used to encrypt the .env into .env.enc
  * @returns   {String}                writes the encrypted file to disk at same location where the encrypted file was found and returns its md5 checksum
  */
-function encrypt(passwd) {
+function encrypt(passwd, encryptedFilename) {
   let cipher = crypto.createCipher(algor, passwd),
+    filename = encryptedFilename || ENCRYPTED_FILENAME,
     decryptedFileLocation = findFileLocation(DECRYPTED_FILENAME),
     decryptedFileFullPath = decryptedFileLocation + DECRYPTED_FILENAME,
-    encryptedFileFullPath = decryptedFileLocation + ENCRYPTED_FILENAME, // we write encrypted file at same location as where we found decrypted file
+    encryptedFileFullPath = decryptedFileLocation + filename, // we write encrypted file at same location as where we found decrypted file
     encBuff;
   if (!passwd) {
     throw new Error('encryption requires a password');
