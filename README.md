@@ -104,13 +104,18 @@ NOTE: this only regenerates the `.env` from the encrypted `.env.enc` file (no en
 
 ## Testing
 
-To run the tests you need a `.env` and its encrypted equivalent `.env.enc` in the root folder. You can create your own as described above or copy the sample ones found in the `./test` folder:
-```bash
-cp ./test/.env.sample ./.env 
-cp ./test/.env.enc.sample ./.env.enc 
+There are two sample files used for the tests.
+
+File `.env.sample` with contents:
+
+```
+FOO=bar
 ```
 
-Then run tests with:
+and its encrypted counterpart file `.env.enc.sample`.
+
+To run the tests:
+
 ```bash
 npm t
 ```

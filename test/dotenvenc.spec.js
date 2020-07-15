@@ -1,21 +1,30 @@
 const ENC_PASSWD = 'myTestingEncryptionPassword',
     DECRYPTED_FILE = './.env',
-    DECRYPTED_FILE_BACKUP = './.env.backup',
+    DECRYPTED_FILE_SAMPLE = './.env.sample',
     ENCRYPTED_FILE = './.env.enc',
-    ENCRYPTED_FILE_BACKUP = './.env.enc.backup';
+    ENCRYPTED_FILE_SAMPLE = './.env.enc.sample';
 
-let dotenvenc = require('../index'),
-    fs = require('fs'),
-    md5FileSync = require('md5-file').sync,
-    expect = require('chai').expect;
+const dotenvenc = require('../index');
+const fs = require('fs');
+const md5FileSync = require('md5-file').sync;
+const expect = require('chai').expect;
 
 describe('encryption', () => {
     beforeEach(() => {
         try {
-            // Reproduce .env from pristine .env.backup
-            fs.writeFileSync(DECRYPTED_FILE, fs.readFileSync(DECRYPTED_FILE_BACKUP));
+            // Reproduce .env from pristine .env.sample
+            fs.writeFileSync(DECRYPTED_FILE, fs.readFileSync(DECRYPTED_FILE_SAMPLE));
             // Remove potentially already existing .env.enc
             fs.unlinkSync(ENCRYPTED_FILE);
+        } catch (err) {
+            // file didn't exist; ignore
+        }
+    });
+
+    afterEach(() => {
+        try {
+            fs.unlinkSync(ENCRYPTED_FILE);
+            fs.unlinkSync(DECRYPTED_FILE);
         } catch (err) {
             // file didn't exist; ignore
         }
@@ -30,9 +39,18 @@ describe('encryption', () => {
 describe('decryption', () => {
     beforeEach(() => {
         try {
-            // Reproduce .env.enc from pristine .env.enc.backup
-            fs.writeFileSync(ENCRYPTED_FILE, fs.readFileSync(ENCRYPTED_FILE_BACKUP));
+            // Reproduce .env.enc from pristine .env.enc.sample
+            fs.writeFileSync(ENCRYPTED_FILE, fs.readFileSync(ENCRYPTED_FILE_SAMPLE));
             // Remove potentially already existing .env
+            fs.unlinkSync(DECRYPTED_FILE);
+        } catch (err) {
+            // file didn't exist; ignore
+        }
+    });
+
+    afterEach(() => {
+        try {
+            fs.unlinkSync(ENCRYPTED_FILE);
             fs.unlinkSync(DECRYPTED_FILE);
         } catch (err) {
             // file didn't exist; ignore

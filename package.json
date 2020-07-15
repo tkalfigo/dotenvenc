@@ -1,6 +1,6 @@
 {
   "name": "dotenvenc",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Encrypt and decrypt your .env file so you can store sensitive information (passwords etc.) in source control",
   "keywords": [
     "1password",
