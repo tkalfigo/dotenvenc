@@ -18,8 +18,8 @@ TIP: add `.env` in your `.gitignore` so it's guaranteed to never get versioned.
 ## Installation
 
 Install and save as a local dependency in your project:
-```
-npm i -S dotenvenc
+```bash
+npm i dotenvenc
 ```
 
 ## Encryption
@@ -29,12 +29,12 @@ npm i -S dotenvenc
 Generate the encrypted `.env.enc` from the clear-text `.env` (for this file's format, consult the [`dotenv`](https://www.npmjs.com/package/dotenv) docs)
 using the installed command line script `dotenvenc`:
 
-```
-$ <PROJECT_PATH>/node_modules/.bin/dotenvenc myPassword
+```bash
+<PROJECT_PATH>/node_modules/.bin/dotenvenc myPassword
 ```
 or equivalently with the explicit '-e' flag:
-```
-$ <PROJECT_PATH>/node_modules/.bin/dotenvenc -e myPassword
+```bash
+<PROJECT_PATH>/node_modules/.bin/dotenvenc -e myPassword
 ```
 
 You need to do this once in the beginning or when you make changes to your `.env`.
@@ -44,8 +44,8 @@ or till it reaches the app's root folder (app's root is considered to be the fol
 is the location where commonly `.env` and consequently `.env.enc` are stored).
 
 NOTE: If you have npm@5.2.0 or better, then you have in your path also [npx](https://www.npmjs.com/package/npx), so the above command is simply:
-```
-$ npx dotenvenc myPassword
+```bash
+npx dotenvenc myPassword
 ```
 
 #### Step 2
@@ -68,7 +68,7 @@ There are two ways to do this.
 
 From inside your project you regenerate the `.env` and, combined with something like `dotenv`, create from it the
 corresponding environment variables to use in your code.
-```
+```javascript
 require('dotenvenc')('myPassword'); // will only regenerate `.env`; it will not create any environment variables from it
 require('dotenv').config(); // this will read the generated `.env` and populate process.env.* accordingly
 ```
@@ -83,7 +83,7 @@ CHASTITIY_KEY='youShallNotPass'
 and you have generated `.env.enc` with the key `myPassword` which you saved in environment variale `DOTENVENC_KEY`  (see `Ecryption` above).
 
 Then in your project code:
-```
+```javascript
 require('dotenvenc')(process.env.DOTENVENC_KEY);
 require('dotenv').config();
 // From here on you have access the passwords through process.env.DB_PASS and process.env.CHASTITIY_KEY
@@ -92,8 +92,8 @@ require('dotenv').config();
 ### Option 2: Command line
 
 Using the script mentioned earlier with the `-d` flag:
-```
-$ <PROJECT_PATH>/node_modules/.bin/dotenvenc -d myPassword
+```bash
+<PROJECT_PATH>/node_modules/.bin/dotenvenc -d myPassword
 ```
 
 This can be useful if you corrupt your `.env` (remember that `.env` is an unversioned file). With the `dotenvenc` script
@@ -101,6 +101,19 @@ you can recreate it to its last functioning state from your `.env.enc` unless yo
 the `Encryption` step above on the corrupted `.env` (then you done!)
 
 NOTE: this only regenerates the `.env` from the encrypted `.env.enc` file (no environment variables are created from its contents).
+
+## Testing
+
+To run the tests you need a `.env` and its encrypted equivalent `.env.enc` in the root folder. You can create your own as described above or copy the sample ones found in the `./test` folder:
+```bash
+cp ./test/.env.sample ./.env 
+cp ./test/.env.enc.sample ./.env.enc 
+```
+
+Then run tests with:
+```bash
+npm t
+```
 
 ## Inspired by
 

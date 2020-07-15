@@ -1,13 +1,15 @@
-let crypto = require('crypto'),
-  path = require('path'),
-  md5FileSync = require('md5-file').sync,
-  statSync = require('fs').statSync,
-  readFile = require('fs').readFileSync,
-  writeFile = require('fs').writeFileSync,
-  algor = 'aes-256-ctr';
+const crypto = require('crypto');
+const path = require('path');
+const md5FileSync = require('md5-file').sync;
+const statSync = require('fs').statSync;
+const { readFileSync, writeFileSync } = require('fs');
 
-const ENCRYPTED_FILENAME = '.env.enc',
-  DECRYPTED_FILENAME = '.env';
+const ENCRYPTED_FILENAME = '.env.enc';
+const DECRYPTED_FILENAME = '.env';
+const ALGOR = 'aes-256-ctr';
+const IV_LENGTH = 16;
+const MAX_KEY_LENGTH = 32;
+const BUFFER_PADDING = Buffer.alloc(MAX_KEY_LENGTH); // key used in createCipheriv()/createDecipheriv() buffer needs to be 32 bytes
 
 /**
  * Checks if a file or directory exists
@@ -51,16 +53,20 @@ function findFileLocation(file) {
  * @returns   {String}                writes the decrypted file to disk at same location where the decrypted file was found and returns its md5 checksum
  */
 function decrypt(passwd) {
-  let decipher = crypto.createDecipher(algor, passwd),
-    encryptedFileLocation = findFileLocation(ENCRYPTED_FILENAME),
-    encryptedFileFullPath = encryptedFileLocation + ENCRYPTED_FILENAME,
-    decryptedFileFullPath = encryptedFileLocation + DECRYPTED_FILENAME, // we write decrypted file at same location as where we found encrypted file
-    decBuff;
   if (!passwd) {
     throw new Error('decryption requires a password');
   }
-  decBuff = Buffer.concat([decipher.update(readFile(encryptedFileFullPath)), decipher.final()]);
-  writeFile(decryptedFileFullPath, decBuff);
+  const encryptedFileLocation = findFileLocation(ENCRYPTED_FILENAME);
+  const encryptedFileFullPath = encryptedFileLocation + ENCRYPTED_FILENAME;
+  const decryptedFileFullPath = encryptedFileLocation + DECRYPTED_FILENAME; // we write decrypted file at same location as where we found encrypted file
+
+  const allData = readFileSync(encryptedFileFullPath);
+  const [ivText, encText] = allData.toString().split(':');
+  const ivBuff = Buffer.from(ivText, 'hex');
+  const encBuff = Buffer.from(encText, 'hex');
+  const decipher = crypto.createDecipheriv(ALGOR, Buffer.concat([Buffer.from(passwd), BUFFER_PADDING], MAX_KEY_LENGTH), ivBuff);
+  const decBuff = Buffer.concat([decipher.update(encBuff), decipher.final()]);
+  writeFileSync(decryptedFileFullPath, decBuff);
   return md5FileSync(decryptedFileFullPath);
 }
 
@@ -70,16 +76,17 @@ function decrypt(passwd) {
  * @returns   {String}                writes the encrypted file to disk at same location where the encrypted file was found and returns its md5 checksum
  */
 function encrypt(passwd) {
-  let cipher = crypto.createCipher(algor, passwd),
-    decryptedFileLocation = findFileLocation(DECRYPTED_FILENAME),
-    decryptedFileFullPath = decryptedFileLocation + DECRYPTED_FILENAME,
-    encryptedFileFullPath = decryptedFileLocation + ENCRYPTED_FILENAME, // we write encrypted file at same location as where we found decrypted file
-    encBuff;
   if (!passwd) {
     throw new Error('encryption requires a password');
   }
-  encBuff = Buffer.concat([cipher.update(readFile(decryptedFileFullPath)), cipher.final()]);
-  writeFile(encryptedFileFullPath, encBuff);
+  const decryptedFileLocation = findFileLocation(DECRYPTED_FILENAME);
+  const decryptedFileFullPath = decryptedFileLocation + DECRYPTED_FILENAME;
+  const encryptedFileFullPath = decryptedFileLocation + ENCRYPTED_FILENAME; // we write encrypted file at same location as where we found decrypted file
+
+  const ivBuff = crypto.randomBytes(IV_LENGTH);
+  const cipher = crypto.createCipheriv(ALGOR, Buffer.concat([Buffer.from(passwd), BUFFER_PADDING], MAX_KEY_LENGTH), ivBuff);
+  const encBuff = Buffer.concat([cipher.update(readFileSync(decryptedFileFullPath)), cipher.final()]);
+  writeFileSync(encryptedFileFullPath, ivBuff.toString('hex') + ':' + encBuff.toString('hex'));
   return md5FileSync(encryptedFileFullPath);
 }
 
