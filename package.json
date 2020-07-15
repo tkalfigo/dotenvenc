@@ -1,6 +1,6 @@
 {
   "name": "dotenvenc",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Encrypt and decrypt your .env file so you can store sensitive information (passwords etc.) in source control",
   "keywords": [
     "1password",
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "md5-file": "3.1.1",
-    "minimist": "^1.2.0"
+    "minimist": "1.2.5"
   },
   "main": "index",
   "bin": {
@@ -31,7 +31,7 @@
     "test": "./node_modules/.bin/mocha --reporter spec"
   },
   "devDependencies": {
-    "chai": "^4.1.0",
-    "mocha": "^3.4.2"
+    "chai": "4.1.0",
+    "mocha": "8.0.1"
   }
 }
