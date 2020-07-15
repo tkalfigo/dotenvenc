@@ -41,7 +41,7 @@ You need to do this once in the beginning or when you make changes to your `.env
 
 This script will search for the `.env` in the folder where you execute the command and will move up till it either finds it
 or till it reaches the app's root folder (app's root is considered to be the folder that contains a `package.json` and
-is the location where commondly `.env` and consequently `.env.enc` are stored).
+is the location where commonly `.env` and consequently `.env.enc` are stored).
 
 NOTE: If you have npm@5.2.0 or better, then you have in your path also [npx](https://www.npmjs.com/package/npx), so the above command is simply:
 ```
