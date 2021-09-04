@@ -1,75 +1,73 @@
-const ENC_PASSWD = 'myTestingEncryptionPassword',
-    DECRYPTED_FILE = './.env',
-    DECRYPTED_FILE_SAMPLE = './.env.sample',
-    ENCRYPTED_FILE = './.env.enc',
-    ENCRYPTED_FILE_CUSTOM = './.env.enc.custom',
+const ENC_PASSWD = 'myTestingEncryptionPassword';
+const SAMPLE_DECRYPTED_FILE = './.env.sample';
+const SAMPLE_ENCRYPTED_FILE = './.env.enc.sample';
+const DEFAULT_DECRYPTED_FILE = './.env';
+const DEFAULT_ENCRYPTED_FILE = './.env.enc';
+const CUSTOM_ENCRYPTED_FILE = './.env.enc.custom';
 
 const dotenvenc = require('../index');
 const fs = require('fs');
 const md5FileSync = require('md5-file').sync;
 const expect = require('chai').expect;
 
+function removeFile(filename) {
+    try {
+        fs.unlinkSync(filename);
+    } catch (err) {
+        // file didn't exist; ignore
+    }
+}
+
 describe('encryption', () => {
     beforeEach(() => {
-        try {
-            // Reproduce .env from pristine .env.sample
-            fs.writeFileSync(DECRYPTED_FILE, fs.readFileSync(DECRYPTED_FILE_SAMPLE));
-            // Remove potentially already existing .env.enc
-            fs.unlinkSync(ENCRYPTED_FILE);
-        } catch (err) {
-            // file didn't exist; ignore
-        }
+        // Restore decrypted file from pristine sample
+        fs.writeFileSync(DEFAULT_DECRYPTED_FILE, fs.readFileSync(SAMPLE_DECRYPTED_FILE));
+        // Remove potentially existing encrypted files
+        removeFile(DEFAULT_ENCRYPTED_FILE);
+        removeFile(CUSTOM_ENCRYPTED_FILE);
+
     });
 
     afterEach(() => {
-        try {
-            fs.unlinkSync(ENCRYPTED_FILE);
-            fs.unlinkSync(DECRYPTED_FILE);
-        } catch (err) {
-            // file didn't exist; ignore
-        }
+        removeFile(DEFAULT_ENCRYPTED_FILE);
+        removeFile(DEFAULT_DECRYPTED_FILE);
+        removeFile(CUSTOM_ENCRYPTED_FILE);
     });
 
-    it('should encrypt .env into valid .env.enc', () => {
+    it(`should encrypt default decrypted file ${DEFAULT_DECRYPTED_FILE} into valid default encrypted file ${DEFAULT_ENCRYPTED_FILE}`, () => {
         let encryptedFileMD5 = dotenvenc.encrypt(ENC_PASSWD);
-        expect(encryptedFileMD5).to.equal(md5FileSync(ENCRYPTED_FILE));
+        expect(encryptedFileMD5).to.equal(md5FileSync(DEFAULT_ENCRYPTED_FILE));
     });
 
-    it('should encrypt .env into valid .env.enc.custom', () => {
-        let encryptedFileMD5 = dotenvenc.encrypt(ENC_PASSWD, ENCRYPTED_FILE_CUSTOM);
-        expect(encryptedFileMD5).to.equal(md5FileSync(ENCRYPTED_FILE_CUSTOM));
+    it(`should encrypt default decrypted file ${DEFAULT_DECRYPTED_FILE} into valid custom encrypted file ${CUSTOM_ENCRYPTED_FILE}`, () => {
+        let encryptedFileMD5 = dotenvenc.encrypt(ENC_PASSWD, CUSTOM_ENCRYPTED_FILE);
+        expect(encryptedFileMD5).to.equal(md5FileSync(CUSTOM_ENCRYPTED_FILE));
     });
 });
 
 describe('decryption', () => {
     beforeEach(() => {
-        try {
-            // Reproduce .env.enc from pristine .env.enc.sample
-            fs.writeFileSync(ENCRYPTED_FILE, fs.readFileSync(ENCRYPTED_FILE_SAMPLE));
-            // Remove potentially already existing .env
-            fs.unlinkSync(DECRYPTED_FILE);
-        } catch (err) {
-            // file didn't exist; ignore
-        }
+        // Restore encrypted files (default and custom) from pristine sample
+        fs.writeFileSync(DEFAULT_ENCRYPTED_FILE, fs.readFileSync(SAMPLE_ENCRYPTED_FILE));
+        fs.writeFileSync(CUSTOM_ENCRYPTED_FILE, fs.readFileSync(SAMPLE_ENCRYPTED_FILE));
+        // Remove potentially already existing decrypted file
+        removeFile(DEFAULT_DECRYPTED_FILE);
     });
 
     afterEach(() => {
-        try {
-            fs.unlinkSync(ENCRYPTED_FILE);
-            fs.unlinkSync(DECRYPTED_FILE);
-        } catch (err) {
-            // file didn't exist; ignore
-        }
+        removeFile(DEFAULT_ENCRYPTED_FILE);
+        removeFile(DEFAULT_DECRYPTED_FILE);
+        removeFile(CUSTOM_ENCRYPTED_FILE);
     });
 
-    it('should decrypt .env.enc into valid .env', () => {
+    it(`should decrypt default encrypted file ${DEFAULT_ENCRYPTED_FILE} into valid decrypted file ${DEFAULT_DECRYPTED_FILE}`, () => {
         let decryptedFileMD5 = dotenvenc(ENC_PASSWD);
-        expect(decryptedFileMD5).to.equal(md5FileSync(DECRYPTED_FILE));
+        expect(decryptedFileMD5).to.equal(md5FileSync(DEFAULT_DECRYPTED_FILE));
     });
 
-    it('should decrypt .env.enc.custom into valid .env', () => {
-        let decryptedFileMD5 = dotenvenc(ENC_PASSWD, ENCRYPTED_FILE_CUSTOM);
-        expect(decryptedFileMD5).to.equal(md5FileSync(DECRYPTED_FILE));
+    it(`should decrypt custom encrypted file ${CUSTOM_ENCRYPTED_FILE} into valid decrypted file ${DEFAULT_DECRYPTED_FILE}`, () => {
+        let decryptedFileMD5 = dotenvenc(ENC_PASSWD, CUSTOM_ENCRYPTED_FILE);
+        expect(decryptedFileMD5).to.equal(md5FileSync(DEFAULT_DECRYPTED_FILE));
     });
 });
 
