@@ -1,6 +1,6 @@
 {
   "name": "dotenvenc",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Encrypt and decrypt your .env file so you can store sensitive information (passwords etc.) in source control",
   "keywords": [
     "1password",
@@ -32,6 +32,6 @@
   },
   "devDependencies": {
     "chai": "4.1.0",
-    "mocha": "8.0.1"
+    "mocha": "9.1.1"
   }
 }

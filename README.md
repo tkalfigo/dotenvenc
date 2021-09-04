@@ -37,6 +37,17 @@ or equivalently with the explicit '-e' flag:
 <PROJECT_PATH>/node_modules/.bin/dotenvenc -e myPassword
 ```
 
+Also (starting with version 2.1.0) you can define a custom filename for the encrypted file to override the default `.env`. 
+For example to create custom encrypted file `.env.enc.custom`:
+
+```bash
+<PROJECT_PATH>/node_modules/.bin/dotenvenc myPassword -f .env.enc.custom
+```
+or equivalently with the explicit '-e' flag:
+```bash
+<PROJECT_PATH>/node_modules/.bin/dotenvenc -e myPassword -f .env.enc.custom
+```
+
 You need to do this once in the beginning or when you make changes to your `.env`.
 
 This script will search for the `.env` in the folder where you execute the command and will move up till it either finds it
@@ -59,32 +70,27 @@ You can choose any name for this variable.
 
 ## Decryption
 
-Once you have created the `.env.enc` (by default will be stored in same folder where `.env` was found), you need to
-regenerate the clear-text `.env` at runtime to access the password, tokens etc.
-
-There are two ways to do this.
-
-### Option 1: Javascript code
-
-From inside your project you regenerate the `.env` and, combined with something like `dotenv`, create from it the
-corresponding environment variables to use in your code.
-```javascript
-require('dotenvenc')('myPassword'); // will only regenerate `.env`; it will not create any environment variables from it
-require('dotenv').config(); // this will read the generated `.env` and populate process.env.* accordingly
-```
-
-#### Example
+Once you have created the `.env.enc` (by default will be stored in same folder where `.env` was found), you need to regenerate the clear-text `.env` at runtime to access the password, tokens etc.
 
 Assuming your `.env` with the sensitive data is:
 ```
 DB_PASS='mySupercalifragilisticexpialidociousPassword'
-CHASTITIY_KEY='youShallNotPass'
+CHASTITY_KEY='youShallNotPass'
 ```
-and you have generated `.env.enc` with the key `myPassword` which you saved in environment variale `DOTENVENC_KEY`  (see `Ecryption` above).
+and you have generated `.env.enc` with the key `myPassword` which you saved in environment variale `DOTENVENC_KEY` (see `Ecryption` above), there are two ways to do this.
 
-Then in your project code:
+### Option 1: Javascript code
+
 ```javascript
 require('dotenvenc')(process.env.DOTENVENC_KEY);
+require('dotenv').config();
+// From here on you have access the passwords through process.env.DB_PASS and process.env.CHASTITIY_KEY
+```
+
+Or if you used a custom encrypted filename e.g. `.env.enc.custom`:
+
+```javascript
+require('dotenvenc')(process.env.DOTENVENC_KEY, '.env.enc.custom');
 require('dotenv').config();
 // From here on you have access the passwords through process.env.DB_PASS and process.env.CHASTITIY_KEY
 ```
@@ -96,9 +102,15 @@ Using the script mentioned earlier with the `-d` flag:
 <PROJECT_PATH>/node_modules/.bin/dotenvenc -d myPassword
 ```
 
+Or if you used a custom encrypted filename e.g. `.env.enc.custom`:
+
+```bash
+<PROJECT_PATH>/node_modules/.bin/dotenvenc -d myPassword -f .env.enc.custom
+```
+
 This can be useful if you corrupt your `.env` (remember that `.env` is an unversioned file). With the `dotenvenc` script
 you can recreate it to its last functioning state from your `.env.enc` unless you corrupted that one too by running
-the `Encryption` step above on the corrupted `.env` (then you done!)
+the `Encryption` step above on the corrupted `.env` (then you're done!)
 
 NOTE: this only regenerates the `.env` from the encrypted `.env.enc` file (no environment variables are created from its contents).
 
@@ -112,7 +124,7 @@ File `.env.sample` with contents:
 FOO=bar
 ```
 
-and its encrypted counterpart file `.env.enc.sample`.
+and its encrypted counterpart file `.env.enc.custom`.
 
 To run the tests:
 
