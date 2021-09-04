@@ -1,23 +1,18 @@
 #!/usr/bin/env node
 
-/**
- * To encrypt a file:
- * -e <fileToEncrypt> <password>
- * To decrype a file:
- * -d <fileToDecrypt> <password>
- */
-let args = require('minimist')(process.argv.slice(2), {
+const args = require('minimist')(process.argv.slice(2), {
     boolean: ['e', 'd', 'h'],
-    string: ['f'],
+    string: ['i', 'o'],
     alias: {
         e: 'encrypt',
         d: 'decrypt',
-        f: 'filename',
+        i: 'input',
+        o: 'output',
         h: 'help',
     }
-}),
-    dotenvenc = require('../index'),
-    passwd = args._[0];
+});
+const dotenvenc = require('../index');
+const passwd = args._[0];
 
 /**
  * @param   {String}    error       optional error message to print before printing the help syntax
@@ -27,32 +22,39 @@ function printHelp(error) {
         console.log(`Error: `, error);
     }
     console.log(`
-Arguments:
-    -e, --encrypt    to encrypt the unencrypted ".env" file into ".env.enc" (encryption is the default operation on command line; can be ommited)
-    -d, --decrypt    to decrypt the default encrypted ".env.enc" file into .env
-    -f, --filename   define custom encrypted file e.g. ".env.enc.production" (for both encryption and decryption operations)
+* Usage:
+    - To encrypt:
+    $ dotenvenc -e [-i decryptedPathname] [-o encryptedPathname] <password>
+    
+    - To decrypt:
+    $ dotenvenc -d [-i encryptedPathname] [-o decryptedPathname] <password>
+    
+* Arguments:
+    -e, --encrypt    to encrypt an unencrypted file
+    -d, --decrypt    to decrypt an encrypted file
+    -i, --input      the input file's pathname; if decrypting this is the encrypted pathname (default is "./.env.enc") else if encrypting this is the decrypted file's pathname (default is "./.env")
+    -o, --output     the output file's pathname i.e. if encrypting this is the encrypted pathname (default is "./.env.enc") else if decrypting this is the decrypted file's pathname (default is "./.env")
     -h, --help       print this help
-
-Usage:
-    $ dotenvenc [-e|-d] <password>
-
-Examples:
-    - Encryption:
-        - To encrypt unencrypted ".env" into default ".env.enc"
-            $ dotenvenc -e myEncryptionPassword
-        - Or equivalently ommitting the '-e' flag
-            $ dotenvenc myEncryptionPassword
     
-        - To encrypt unencrypted ".env" into custom file e.g. ".env.enc.production"
-            $ dotenvenc -e myEncryptionPassword -f .env.enc.production
-        - Or equivalently ommitting the '-e' flag
-            $ dotenvenc myEncryptionPassword -f .env.enc.production
-    
-    - Decryption:
-        - To decrypt default ".env.enc" into the original ".env"
-            $ dotenvenc -d myEncryptionPassword
-        - To decrypt custom encrypted file e.g. ".env.enc.production" into unencrypted ".env"
-            $ dotenvenc -d myEncryptionPassword -f .env.enc.production
+* Encryption examples:
+    - To encrypt default unencrypted "./.env" into default encrypted "./.env.enc"
+        $ dotenvenc -e myPassword
+    - To encrypt default unencrypted "./.env" into custom encrypted file "/somewhere/else/.env.enc.custom"
+        $ dotenvenc -e -o /somewhere/else/.env.enc.custom myPassword
+    - To encrypt custom unencrypted "/elsewhere/.env.custom" into default encrypted file "./.env.enc"
+        $ dotenvenc -e -i /elsewhere/.env.custom myPassword
+    - To encrypt custom unencrypted "/elsewhere/.env.custom" into custom encrypted file "/somewhere/else/.env.enc.custom"
+        $ dotenvenc -e -i /elsewhere/.env.custom -o /somewhere/else/.env.enc.custom myPassword
+
+* Decryption example:
+    - To decrypt default encrypted "./.env.enc" into default unencrypted "./.env"
+        $ dotenvenc -d myPassword
+    - To decrypt default encrypted "./.env.enc" into custom unencrypted file "/elsewhere/.env.custom"
+        $ dotenvenc -d -o /elsewhere/.env.custom myPassword
+    - To decrypt custom encrypted "/somewhere/else/.env.enc.custom" into default unencrypted file "./.env"
+        $ dotenvenc -d -i /somewhere/else/.env.enc.custom myPassword
+    - To decrypt custom unencrypted "/somewhere/else/.env.enc.custom" into custom unencrypted file "/elsewhere/.env.custom"
+        $ dotenvenc -d -i /somewhere/else/.env.enc.custom -o /elsewhere/.env.custom myPassword
 `);
     process.exit(0);
 }
@@ -60,11 +62,11 @@ Examples:
 if (args.h) {
     printHelp();
 } else if (!passwd) {
-    printHelp('missing password');
+    printHelp('Missing password');
 } else if (args.d) {
-    // Decrypt ".env.enc" into ".env" (or custom filename if provided via -f argument)
-    dotenvenc(passwd, args.f);
+    dotenvenc.decrypt({ passwd, encryptedPathname: args.i, decryptedPathname: args.o });
+} else if (args.e) {
+    dotenvenc.encrypt({ passwd, decryptedPathname: args.i, encryptedPathname: args.o });
 } else {
-    // Script's default operation is to encrypt the ".env" into ".env.enc" (or custom filename if provided via -f argument)
-    dotenvenc.encrypt(passwd, args.f);
+    printHelp('Missing either -e to encrypt or -d to decrypt');
 }
