@@ -1,6 +1,6 @@
 # dotenvenc
 
-  Encrypt and decrypt your .env so it doesn't expose sensitive information (passwords, tokens etc.)
+Encrypt and decrypt your .env so it doesn't expose sensitive information (passwords, tokens etc.)
 
 ## Use case
 
@@ -30,33 +30,27 @@ Generate the encrypted `.env.enc` from the clear-text `.env` (for this file's fo
 using the installed command line script `dotenvenc`:
 
 ```bash
-<PROJECT_PATH>/node_modules/.bin/dotenvenc myPassword
-```
-or equivalently with the explicit '-e' flag:
-```bash
 <PROJECT_PATH>/node_modules/.bin/dotenvenc -e myPassword
 ```
 
-Also (starting with version 2.1.0) you can define a custom filename for the encrypted file to override the default `.env`. 
-For example to create custom encrypted file `.env.enc.custom`:
+Also you can define custom pathnames for both the input and output file of the encryption or decryption operation.
+
+For example to create encrypt a custom clear-text file `/somewhere/.env.custom` into custom encrypted file `./somewhere/else/.env.enc.custom`:
 
 ```bash
-<PROJECT_PATH>/node_modules/.bin/dotenvenc myPassword -f .env.enc.custom
-```
-or equivalently with the explicit '-e' flag:
-```bash
-<PROJECT_PATH>/node_modules/.bin/dotenvenc -e myPassword -f .env.enc.custom
+<PROJECT_PATH>/node_modules/.bin/dotenvenc -e -i /somewhere/.env.custom -o ./somewhere/else/.env.enc.custom myPassword
 ```
 
 You need to do this once in the beginning or when you make changes to your `.env`.
 
-This script will search for the `.env` in the folder where you execute the command and will move up till it either finds it
-or till it reaches the app's root folder (app's root is considered to be the folder that contains a `package.json` and
-is the location where commonly `.env` and consequently `.env.enc` are stored).
+If `-i` and `-o` are ommitted, the defaults are:
+
+   * `./.env` for the unencrypted file used as input for the encryption or as output for the decryption
+   * `./.env.enc` for the encrypted file used as output for the encryption or as input for the decryption
 
 NOTE: If you have npm@5.2.0 or better, then you have in your path also [npx](https://www.npmjs.com/package/npx), so the above command is simply:
 ```bash
-npx dotenvenc myPassword
+npx dotenvenc ...
 ```
 
 #### Step 2
@@ -70,7 +64,7 @@ You can choose any name for this variable.
 
 ## Decryption
 
-Once you have created the `.env.enc` (by default will be stored in same folder where `.env` was found), you need to regenerate the clear-text `.env` at runtime to access the password, tokens etc.
+Once you have created the `.env.enc` you need to regenerate the clear-text `.env` at runtime to access the password, tokens etc.
 
 Assuming your `.env` with the sensitive data is:
 ```
@@ -82,15 +76,15 @@ and you have generated `.env.enc` with the key `myPassword` which you saved in e
 ### Option 1: Javascript code
 
 ```javascript
-require('dotenvenc')(process.env.DOTENVENC_KEY);
+require('dotenvenc').decrypt({ passwd: process.env.DOTENVENC_KEY});
 require('dotenv').config();
 // From here on you have access the passwords through process.env.DB_PASS and process.env.CHASTITIY_KEY
 ```
 
-Or if you used a custom encrypted filename e.g. `.env.enc.custom`:
+Or if you used custom encrypted and decrypted pathnames e.g. `./somewhere/.env.enc.custom` and `./somewhere/else/.env.custom` respectively, then:
 
 ```javascript
-require('dotenvenc')(process.env.DOTENVENC_KEY, '.env.enc.custom');
+require('dotenvenc').decrypt({ passwd: process.env.DOTENVENC_KEY, encryptedPathname: './somewhere/.env.enc.custom', decryptedPathname: './somewhere/else/.env.custom'});
 require('dotenv').config();
 // From here on you have access the passwords through process.env.DB_PASS and process.env.CHASTITIY_KEY
 ```
@@ -102,10 +96,10 @@ Using the script mentioned earlier with the `-d` flag:
 <PROJECT_PATH>/node_modules/.bin/dotenvenc -d myPassword
 ```
 
-Or if you used a custom encrypted filename e.g. `.env.enc.custom`:
+Or if you used custom encrypted and decrypted pathnames e.g. `./somewhere/.env.enc.custom` and `./somewhere/else/.env.custom` respectively, then:
 
 ```bash
-<PROJECT_PATH>/node_modules/.bin/dotenvenc -d myPassword -f .env.enc.custom
+<PROJECT_PATH>/node_modules/.bin/dotenvenc -d  -i ./somewhere/.env.enc.custom -o ./somewhere/else/.env.custom myPassword
 ```
 
 This can be useful if you corrupt your `.env` (remember that `.env` is an unversioned file). With the `dotenvenc` script
@@ -124,7 +118,7 @@ File `.env.sample` with contents:
 FOO=bar
 ```
 
-and its encrypted counterpart file `.env.enc.custom`.
+and its encrypted counterpart `.env.enc.custom`.
 
 To run the tests:
 
