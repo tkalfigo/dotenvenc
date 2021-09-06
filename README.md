@@ -118,7 +118,7 @@ File `.env.sample` with contents:
 FOO=bar
 ```
 
-and its encrypted counterpart `.env.enc.custom`.
+and its encrypted counterpart `.env.enc.sample`.
 
 To run the tests:
 
