@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "md5-file": "3.1.1",
-    "minimist": "1.2.5"
+    "minimist": "1.2.6"
   },
   "main": "index",
   "bin": {
