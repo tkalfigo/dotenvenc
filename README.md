@@ -1,3 +1,16 @@
+<font color="red">
+# DEPRECATED
+
+<p bg-color="ping">
+This package has been deprecated
+
+Author message:
+Please consider upgrading to the improved [@tka85/dotenvenc](https://www.npmjs.com/package/@tka85/dotenvenc) with same functionality. This package is no longer actively maintained.
+</p>
+
+---
+</font>
+
 # dotenvenc
 
 Encrypt and decrypt your .env so it doesn't expose sensitive information (passwords, tokens etc.)
